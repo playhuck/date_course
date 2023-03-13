@@ -22,4 +22,4 @@ import { User } from 'src/models/_.loader';
     }),
   ],
 })
-export class MariaConfigModule {}
+export class MariaProvider {}

@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 
-import { MariaConfigModule } from './config/maria.module';
+import { MariaProvider } from './providers/maria.provider';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { MariaConfigModule } from './config/maria.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    MariaConfigModule,
+    MariaProvider,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,11 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from "typeorm";
+import { DataSource, Repository } from 'typeorm';
 
-import { User } from "src/models/_.loader";
-
+import { User } from 'src/models/_.loader';
 
 @Injectable()
-export class UsersRepository {
-    constructor(@InjectRepository(User) private userRepository : Repository<User>){}
+export class UsersRepository extends Repository<User> {
+  constructor(private dataSource: DataSource) {
+    super(User, dataSource.createEntityManager());
+  }
+  async isUserByUserId(userId: string) {
+    const isUserByUserId = await this.findOne({ where: { userId } });
+    return isUserByUserId;
+  }
 }

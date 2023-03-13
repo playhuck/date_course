@@ -1,4 +1,22 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters ,Post } from '@nestjs/common';
+import { Body } from '@nestjs/common/decorators';
+import { LoginUserDto, SignupUserDto } from 'src/models/_.loader';
+import { UsersService } from './users.service';
+import { ErrorFilter } from 'src/decorators/error.decorator';
 
 @Controller('users')
-export class UsersController {}
+@UseFilters(ErrorFilter)
+export class UsersController {
+
+    constructor(private usersService : UsersService){}
+
+    @Post("/signup")
+    async signup(@Body() body : SignupUserDto){
+        return await this.usersService.signup(body);
+    }
+
+    @Post('/login')
+    async login(@Body() body : LoginUserDto){
+        return await this.usersService.login(body);
+    }
+}
