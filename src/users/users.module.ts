@@ -9,9 +9,9 @@ import * as path from 'path';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
-import { MariaModules } from 'src/modules/maria.modules';
+import { MariaModules } from '../modules/maria.modules';
 
-import { JwtStrategyPassport } from 'src/passports/jwt.passport';
+import { JwtStrategyPassport } from '../passports/jwt.passport';
 
 @Module({
   imports: [

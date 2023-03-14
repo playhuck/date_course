@@ -1,8 +1,8 @@
 import { Controller, UseFilters ,Post } from '@nestjs/common';
 import { Body } from '@nestjs/common/decorators';
-import { LoginUserDto, SignupUserDto } from 'src/models/_.loader';
+import { LoginUserDto, SignupUserDto } from '../models/_.loader';
 import { UsersService } from './users.service';
-import { ErrorFilter } from 'src/decorators/error.decorator';
+import { ErrorFilter } from '../decorators/error.decorator';
 
 @Controller('users')
 @UseFilters(ErrorFilter)

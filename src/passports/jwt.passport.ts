@@ -4,10 +4,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { User } from 'src/models/_.loader';
+import { User } from '../models/_.loader';
 import * as fs from 'fs';
 import * as path from 'path';
-import { UsersRepository } from 'src/users/users.repository';
+import { UsersRepository } from '../users/users.repository';
 
 /** NestJS의 Injectable 데코레이터로 클래스를 선언 */
 @Injectable()

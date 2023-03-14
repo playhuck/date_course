@@ -1,6 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import {
-  NotFoundException,
   NotImplementedException,
   UnauthorizedException,
 } from '@nestjs/common/exceptions';
@@ -28,9 +27,10 @@ export class UsersService {
       throw new BadRequestException("PASSWORD DON'T MATCH");
 
     /** 아이디가 존재하는지 확인 */
-    const isUserByUserId = await this.usersRepository.findUserByUserId(userId);
-    if (isUserByUserId !== null)
-      throw new NotFoundException('ID ALREADY IN USE');
+    const findUserByUserId = await this.usersRepository.findUserByUserId(userId);
+    console.log(findUserByUserId)
+    if (findUserByUserId !== null)
+      throw new BadRequestException('ID ALREADY IN USE');
     
     /** 비밀번호 Hash */
     let saltRound = this.configService.get<number>('SALT_ROUND')
