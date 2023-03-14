@@ -21,5 +21,6 @@ import { User } from 'src/models/_.loader';
       inject: [ConfigService],
     }),
   ],
+  providers : []
 })
-export class MariaProvider {}
+export class MariaModules {}
