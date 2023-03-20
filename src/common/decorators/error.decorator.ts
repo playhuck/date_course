@@ -7,14 +7,16 @@ export class ErrorFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
 
-    const err = error ? error : res
-
-    const { response } = err 
-    const { statusCode } = response;
+    console.log(error.message);
+    
+    const { response } = error
+    let statusCode = 0; 
+    if(response === undefined) statusCode = 500;
+    else statusCode = response;
     
     return res.status(statusCode).json({
       message: '서버에서 오류가 발생했습니다.',
-      response,
+      error : error.message,
     });
   }
 }

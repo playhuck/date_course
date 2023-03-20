@@ -5,7 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 
-import { MariaModules } from './modules/maria.modules';
+import { MariaModules } from './common/modules/maria.modules';
 import { PassportModule } from '@nestjs/passport/dist';
 import { ValidationPipe } from '@nestjs/common/pipes';
 

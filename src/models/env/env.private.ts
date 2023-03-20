@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { TNODE_ENV } from 'src/constants/types/t.node.env';
-import { TALGORITHM } from 'src/constants/types/t.algorithm';
+import { TNODE_ENV } from 'src/common/constants/types/t.node.env';
+import { TALGORITHM } from 'src/common/constants/types/t.algorithm';
 
 export function getEnvStr(KEY: string) {
     const VALUE = process.env[KEY];

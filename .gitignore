@@ -1,7 +1,9 @@
 *.env.*
 
 # pem
-*.pem
+private.pem
+public.pem
+*.pem.*
 
 # compiled output
 /dist

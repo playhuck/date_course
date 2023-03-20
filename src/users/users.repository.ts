@@ -7,6 +7,7 @@ import { SignupUserDto, User } from '../models/_.loader';
 export class UsersRepository extends Repository<User> {
   constructor(private dataSource: DataSource) {
     super(User, dataSource.createEntityManager());
+    this.dataSource.createEntityManager()
   }
   async findUserByUserId(userId: string) {
     const findUserByUserId = await this.findOne({ where: { userId } });

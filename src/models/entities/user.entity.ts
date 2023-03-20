@@ -8,15 +8,16 @@ import {
   @Entity()
   export class User {
     @PrimaryGeneratedColumn()
+    @Column('int')
     id: number;
   
-    @Column()
+    @Column('varchar')
     userId: string;
   
-    @Column()
+    @Column('varchar')
     name : string;
 
-    @Column()
+    @Column('varchar')
     password: string;
 
   }

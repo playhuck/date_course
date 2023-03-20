@@ -9,12 +9,14 @@ import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import * as path from 'path';
 import { LoginUserDto, SignupUserDto, User } from 'src/models/_.loader';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: Repository<User>,
+    private readonly dataSource : DataSource,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
   ) {}
@@ -27,7 +29,7 @@ export class UsersService {
       throw new BadRequestException("PASSWORD DON'T MATCH");
 
     /** 아이디가 존재하는지 확인 */
-    const findUserByUserId = await this.usersRepository.findUserByUserId(userId);
+    const findUserByUserId = await this.usersRepository.findOne({ where : { userId }});
     console.log(findUserByUserId)
     if (findUserByUserId !== null)
       throw new BadRequestException('ID ALREADY IN USE');
@@ -39,20 +41,30 @@ export class UsersService {
     const hash = await bcrypt.hash(password, salt);
     if (!hash) throw new NotImplementedException('NOT IMPLEMENT BCRYPT HASH');
 
+    const queryRunner = this.dataSource.createQueryRunner();
+    
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     /** 유저 생성 */
-    const signup = await this.usersRepository.signup(body, hash);
+    const create = this.usersRepository.create(body);
+
+    create.password = hash
+
+    const signup = this.usersRepository.save(create);
+
+    await queryRunner.commitTransaction();
+
     if (!signup) throw new NotImplementedException('NOT IMPLEMENT SAVE USER');
 
     return signup;
   }
 
-  async login(body: LoginUserDto): Promise<string> {
+  async login(body: LoginUserDto): Promise<{token : string}> {
     const { userId, password } = body;
 
     /** userId가 존재하는지 확인 */
-    const findUserByUserId = await this.usersRepository.findUserByUserId(
-      userId,
-    );
+    const findUserByUserId = await this.usersRepository.findOne({ where : { userId }});
     if (!findUserByUserId)
       throw new UnauthorizedException('회원가입이 필요합니다.');
 
@@ -69,8 +81,8 @@ export class UsersService {
     const token = this.jwtService.sign(payload, {
       expiresIn: this.configService.get<string>('JWT_EXPIRED_IN'),
       algorithm: 'RS256',
-    });
+    }); 
 
-    return token;
+    return { token };
   }
 }

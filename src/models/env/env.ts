@@ -1,5 +1,5 @@
 import { getEnvLiteralTypeValue, getEnvNum, getEnvStr, getPemKey } from "./env.private";
-import { TALGORITHM } from "src/constants/types/t.algorithm";
+import { TALGORITHM } from "src/common/constants/types/t.algorithm";
 
 export interface IJwt_Env {
     JWT_ACCESS_EXPIRED_IN: string;
