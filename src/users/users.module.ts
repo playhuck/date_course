@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestInterceptor } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport/dist/passport.module';
@@ -12,7 +12,8 @@ import { MariaModules } from '../common/modules/maria.modules';
 
 import { JwtStrategyPassport } from '../common/passports/jwt.passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/models/_.loader';
+import { User } from '../models/_.loader';
+import { TransactionInterceptor } from 'src/common/interceptors/transaction.interceptor';
 
 @Module({
   imports: [
@@ -29,4 +30,5 @@ import { User } from 'src/models/_.loader';
   controllers: [UsersController],
   providers: [UsersService, JwtStrategyPassport],
 })
-export class UsersModule {}
+export class UsersModule {
+}

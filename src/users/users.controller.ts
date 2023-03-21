@@ -4,8 +4,8 @@ import { LoginUserDto, SignupUserDto, User } from '../models/_.loader';
 import { UsersService } from './users.service';
 import { HttpExceptionFilter } from '../common/exceptions/catch.exception';
 import { currentUser } from '../common/decorators/auth.decorator';
-import { transactionManager } from 'src/common/decorators/transaction.decorator';
-import { TransactionInterceptor } from 'src/common/interceptors/transaction.interceptor';
+import { transactionManager } from '../common/decorators/transaction.decorator';
+import { TransactionInterceptor } from '../common/interceptors/transaction.interceptor';
 import { EntityManager } from 'typeorm';
 
 @Controller('users')

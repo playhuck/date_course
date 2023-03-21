@@ -9,6 +9,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const req = ctx.getRequest<Request>();
     const status = exception.getStatus();
 
+    console.log(status)
+
     return res.status(status).json({
       message: '서버에서 오류가 발생했습니다.',
       error : exception.message,

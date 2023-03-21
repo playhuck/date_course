@@ -2,6 +2,7 @@ import {
   CallHandler,
   ExecutionContext,
   HttpException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NestInterceptor,
@@ -11,7 +12,7 @@ import { DataSource, QueryRunner } from 'typeorm';
 
 @Injectable()
 export class TransactionInterceptor implements NestInterceptor {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(@Inject(DataSource) private readonly dataSource: DataSource) {}
   async intercept(
     context: ExecutionContext,
     next: CallHandler<any>,
