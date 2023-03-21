@@ -8,10 +8,11 @@ import * as path from 'path';
 
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { UsersRepository } from './users.repository';
 import { MariaModules } from '../common/modules/maria.modules';
 
 import { JwtStrategyPassport } from '../common/passports/jwt.passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/models/_.loader';
 
 @Module({
   imports: [
@@ -23,8 +24,9 @@ import { JwtStrategyPassport } from '../common/passports/jwt.passport';
         'utf8',
       ),
     }),
+    TypeOrmModule.forFeature([User])
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepository, JwtStrategyPassport],
+  providers: [UsersService, JwtStrategyPassport],
 })
 export class UsersModule {}

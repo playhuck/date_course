@@ -5,66 +5,64 @@ import {
 } from '@nestjs/common/exceptions';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import * as fs from 'fs';
-import * as path from 'path';
-import { LoginUserDto, SignupUserDto, User } from 'src/models/_.loader';
+import { LoginUserDto, SignupUserDto, User } from '../models/_.loader';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly usersRepository: Repository<User>,
-    private readonly dataSource : DataSource,
+    @InjectRepository(User) private usersRepository: Repository<User>,
+    private readonly dataSource: DataSource,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
   ) {}
 
-  async signup(body: SignupUserDto): Promise<User> {
-    const { userId, name, password, passwordCheck } = body;
+  async signup(body: SignupUserDto, queryRunnerManager : EntityManager ): Promise<User> {
+      const { userId, name, password, passwordCheck } = body;
 
-    /** 비밀번호가 일치하는지 확인 */
-    if (password !== passwordCheck)
-      throw new BadRequestException("PASSWORD DON'T MATCH");
+      /** 비밀번호가 일치하는지 확인 */
+      if (password !== passwordCheck)
+        throw new BadRequestException("PASSWORD DON'T MATCH");
 
-    /** 아이디가 존재하는지 확인 */
-    const findUserByUserId = await this.usersRepository.findOne({ where : { userId }});
-    console.log(findUserByUserId)
-    if (findUserByUserId !== null)
-      throw new BadRequestException('ID ALREADY IN USE');
-    
-    /** 비밀번호 Hash */
-    let saltRound = this.configService.get<number>('SALT_ROUND')
-    const salt = await bcrypt.genSalt(saltRound);
-    
-    const hash = await bcrypt.hash(password, salt);
-    if (!hash) throw new NotImplementedException('NOT IMPLEMENT BCRYPT HASH');
+      /** 아이디가 존재하는지 확인 */
+      // const findUserIdByUserId = await queryRunnerManager.query(`SELECT userId FROM user WHERE userId=?`, [userId]);
+      const findUserIdByUserId = await queryRunnerManager.findOne(User, {
+        where: { userId },
+      });
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+      if (findUserIdByUserId !== null)
+        throw new BadRequestException('ID ALREADY IN USE'); 
 
-    /** 유저 생성 */
-    const create = this.usersRepository.create(body);
+      /** 비밀번호 Hash */
+      let saltRound = this.configService.get<number>('SALT_ROUND');
+      const salt = await bcrypt.genSalt(saltRound);
 
-    create.password = hash
+      const hash = await bcrypt.hash(password, salt);
+      if (!hash) throw new NotImplementedException('NOT IMPLEMENT BCRYPT HASH');
 
-    const signup = this.usersRepository.save(create);
+      /** 유저 생성 */
+      // const insertUser = await queryRunnerManger.query(`
+      // INSERT INTO user ( userId, name, password) VALUES (?,?,?)`, [userId, name, hash]);
+      const create = queryRunnerManager.create(User ,body);
 
-    await queryRunner.commitTransaction();
+      create.password = hash;
 
-    if (!signup) throw new NotImplementedException('NOT IMPLEMENT SAVE USER');
+      const signup = await queryRunnerManager.save(create);
 
-    return signup;
+      if (!signup) throw new NotImplementedException('NOT IMPLEMENT SAVE USER');
+
+      return signup;
   }
 
-  async login(body: LoginUserDto): Promise<{token : string}> {
+  async login(body: LoginUserDto): Promise<{ token: string }> {
     const { userId, password } = body;
 
     /** userId가 존재하는지 확인 */
-    const findUserByUserId = await this.usersRepository.findOne({ where : { userId }});
+    const findUserByUserId = await this.usersRepository.findOne({
+      where: { userId },
+    });
     if (!findUserByUserId)
       throw new UnauthorizedException('회원가입이 필요합니다.');
 
@@ -81,7 +79,7 @@ export class UsersService {
     const token = this.jwtService.sign(payload, {
       expiresIn: this.configService.get<string>('JWT_EXPIRED_IN'),
       algorithm: 'RS256',
-    }); 
+    });
 
     return { token };
   }

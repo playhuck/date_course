@@ -3,6 +3,7 @@ import { DataSource, Repository } from 'typeorm';
 
 import { SignupUserDto, User } from '../models/_.loader';
 
+/** @deprecated */
 @Injectable()
 export class UsersRepository extends Repository<User> {
   constructor(private dataSource: DataSource) {

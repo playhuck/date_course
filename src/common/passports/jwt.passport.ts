@@ -7,7 +7,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { User } from '../../models/_.loader';
 import * as fs from 'fs';
 import * as path from 'path';
-import { UsersRepository } from '../../users/users.repository';
 import { Repository } from 'typeorm';
 
 /** NestJS의 Injectable 데코레이터로 클래스를 선언 */
@@ -15,13 +14,13 @@ import { Repository } from 'typeorm';
 /** PassportStrategy 클래스를 상속하는 JwtStrategyPassport 클래스 */
 export class JwtStrategyPassport extends PassportStrategy(Strategy) {
   constructor(
-    @InjectRepository(UsersRepository) // TypeORM의 Repository 클래스를 주입
+    @InjectRepository(User)
     private usersRepository: Repository<User>, // Users 엔티티의 레포지토리를 usersRepository 변수로 선언
   ) {
     super({
       /** JWT SECRET KEY, TOKEN이 유효한지 CHECK할 때 사용 */
       secretOrKey: fs.readFileSync(
-        path.join(__dirname, '../../../date_course/public.pem'),
+        path.join(__dirname, '../../../public.pem'),
         'utf8',
       ), // Public PEM
       /** TOKEN이 어디서 가져올 지 Header에서 가져올 때 Bearer라는 값을 가지고 있는지 확인 (공식) */
