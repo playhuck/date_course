@@ -29,6 +29,7 @@ import { TransactionInterceptor } from 'src/common/interceptors/transaction.inte
   ],
   controllers: [UsersController],
   providers: [UsersService, JwtStrategyPassport],
+  exports: [UsersService, JwtModule, PassportModule]
 })
 export class UsersModule {
 }

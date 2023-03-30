@@ -61,7 +61,7 @@ export class UsersService {
 
     /** userId가 존재하는지 확인 */
     const findUserByUserId = await this.usersRepository.findOne({
-      where: { userId },
+      where: { userId : userId },
     });
     if (!findUserByUserId)
       throw new UnauthorizedException('회원가입이 필요합니다.');
@@ -69,7 +69,7 @@ export class UsersService {
     /** 아이디가 존재한다면, 비밀번호가 일치 하는지. */
     const comparePassword = await bcrypt.compare(
       password,
-      findUserByUserId.password,
+      findUserByUserId.password
     );
     if (!comparePassword)
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
@@ -82,5 +82,20 @@ export class UsersService {
     });
 
     return { token };
+  };
+
+  async getPayload(user : User) {
+    if(user) return user;
+    else throw new UnauthorizedException('Not Token')
+  }
+
+  async getUserById(id : number) {
+    return await this.usersRepository.findOne({ where : {
+      id
+    }});
+  };
+
+  async delUser(userId : string) {
+    return await this.usersRepository.delete({ userId });
   }
 }
