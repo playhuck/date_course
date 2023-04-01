@@ -38,7 +38,7 @@ export class TransactionInterceptor implements NestInterceptor {
     );
   }
 
-  private async transcationInit(): Promise<QueryRunner> {
+  async transcationInit(): Promise<QueryRunner> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

@@ -24,7 +24,7 @@ export class UsersService {
 
       /** 비밀번호가 일치하는지 확인 */
       if (password !== passwordCheck)
-        throw new BadRequestException("PASSWORD DON'T MATCH");
+        throw new BadRequestException("PASSWORD NOT'T MATCH");
 
       /** 아이디가 존재하는지 확인 */
       // const findUserIdByUserId = await queryRunnerManager.query(`SELECT userId FROM user WHERE userId=?`, [userId]);
