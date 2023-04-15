@@ -5,14 +5,13 @@ import { PassportModule } from '@nestjs/passport/dist/passport.module';
 
 import * as fs from 'fs';
 import * as path from 'path';
-
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { MariaModules } from '../common/modules/maria.modules';
+import { MariaModules } from '../../common/modules/maria.modules';
 
-import { JwtStrategyPassport } from '../common/passports/jwt.passport';
+import { JwtStrategyPassport } from '../../common/passports/jwt.passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../models/_.loader';
+import { User } from '../../models/_.loader';
 import { TransactionInterceptor } from 'src/common/interceptors/transaction.interceptor';
 
 @Module({
@@ -21,7 +20,7 @@ import { TransactionInterceptor } from 'src/common/interceptors/transaction.inte
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       privateKey: fs.readFileSync(
-        path.join(__dirname, '../../../date_course/private.pem'),
+        path.join(__dirname, '../../../secrets/jwt.private.pem'),
         'utf8',
       ),
     }),

@@ -6,7 +6,7 @@ import { AppController } from '../../src/app.controller';
 import { AppService } from '../../src/app.service';
 import { SignupUserDto, User } from '../../src/models/_.loader';
 import { DataSource, Repository } from 'typeorm';
-import { UsersService } from '../../src/users/users.service';
+import { UsersService } from '../../src/routes/users/users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('User Module Integration', () => {

@@ -20,7 +20,7 @@ export class JwtStrategyPassport extends PassportStrategy(Strategy) {
     super({
       /** JWT SECRET KEY, TOKEN이 유효한지 CHECK할 때 사용 */
       secretOrKey: fs.readFileSync(
-        path.join(__dirname, '../../../public.pem'),
+        path.join(__dirname, '../../../secrets/jwt.public.pem'),
         'utf8',
       ), // Public PEM
       /** TOKEN이 어디서 가져올 지 Header에서 가져올 때 Bearer라는 값을 가지고 있는지 확인 (공식) */

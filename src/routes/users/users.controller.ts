@@ -1,11 +1,11 @@
 import { Controller, UseFilters, UseGuards ,Post, Get, HttpCode } from '@nestjs/common';
 import { Body, UseInterceptors } from '@nestjs/common/decorators';
-import { LoginUserDto, SignupUserDto, User } from '../models/_.loader';
+import { LoginUserDto, SignupUserDto, User } from '../../models/_.loader';
 import { UsersService } from './users.service';
-import { HttpExceptionFilter } from '../common/exceptions/catch.exception';
-import { currentUser } from '../common/decorators/auth.decorator';
-import { transactionManager } from '../common/decorators/transaction.decorator';
-import { TransactionInterceptor } from '../common/interceptors/transaction.interceptor';
+import { HttpExceptionFilter } from '../../common/exceptions/catch.exception';
+import { currentUser } from '../../common/decorators/auth.decorator';
+import { transactionManager } from '../../common/decorators/transaction.decorator';
+import { TransactionInterceptor } from '../../common/interceptors/transaction.interceptor';
 import { EntityManager } from 'typeorm';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -20,7 +20,8 @@ export class UsersController {
     @Body() body: SignupUserDto,
     @transactionManager() queryRunnerManger: EntityManager,
   ) {
-    return await this.usersService.signup(body, queryRunnerManger);
+    await this.usersService.signup(body, queryRunnerManger);
+    return { Success : true }
   }
 
   @Post('/login')

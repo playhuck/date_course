@@ -4,11 +4,18 @@ import {
   BadRequestException,
   InternalServerErrorException,
   CallHandler,
-  ExecutionContext
+  ExecutionContext,
 } from '@nestjs/common';
-import { of, Observable, tap, lastValueFrom, throwError as observaleThrowError, catchError } from 'rxjs';
+import {
+  of,
+  Observable,
+  tap,
+  lastValueFrom,
+  throwError as observaleThrowError,
+  catchError,
+} from 'rxjs';
 import { AppModule } from 'src/app.module';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/routes/users/users.service';
 import { MockUsersService } from 'test/mocks/routes/mock.user.service';
 import { SignupUserDto, User } from 'src/models/_.loader';
 import { DataSource, EntityManager, QueryRunner } from 'typeorm';
@@ -24,7 +31,7 @@ describe('UsersService', () => {
   let dataSource: jest.Mocked<DataSource>;
   let callHandler: jest.Mocked<CallHandler>;
   let interceptor: TransactionInterceptor;
-  let context : ExecutionContext;
+  let context: ExecutionContext;
 
   beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -50,11 +57,10 @@ describe('UsersService', () => {
     } as unknown as jest.Mocked<DataSource>;
 
     interceptor = new TransactionInterceptor(dataSource);
+    queryRunner = await interceptor.transcationInit();
+    queryRunnerManager = queryRunner.manager;
 
-    req = {
-      queryRunnerManager: undefined,
-    };
-
+    console.log("Manager:", queryRunnerManager)
     callHandler = {
       handle: jest.fn(() => of(null)),
     } as unknown as jest.Mocked<CallHandler>;
@@ -95,22 +101,24 @@ describe('UsersService', () => {
         } as unknown as ExecutionContext,
         callHandler,
       );
-        
-      expect(req.queryRunnerManager).toBeDefined();
+
+      expect(queryRunnerManager).toBeDefined();
     });
 
     it('should call handle method of the call handler', async () => {
-      let expected : Observable<any>;
+      let expected: Observable<any>;
       callHandler.handle.mockReturnValue(of(expected)); // callHandler.handle() 메서드가 Observable<expected>를 반환하도록 모킹
-    
-      await interceptor.intercept(
-        {
-          switchToHttp: () => ({ getRequest: () => req }),
-        } as unknown as ExecutionContext,
-        callHandler,
-      ).then(result => {
-        expect(result).toBeDefined();
-      });
+
+      await interceptor
+        .intercept(
+          {
+            switchToHttp: () => ({ getRequest: () => req }),
+          } as unknown as ExecutionContext,
+          callHandler,
+        )
+        .then((result) => {
+          expect(result).toBeDefined();
+        });
       expect(callHandler.handle).toHaveBeenCalled();
     });
 
@@ -118,59 +126,53 @@ describe('UsersService', () => {
       const mockNextFn = jest.fn();
       const mockCompleteFn = jest.fn();
 
-      const mockRequest = {
-        queryRunner: null
-      };
-
-      const mockContext = {
-        switchToHttp: jest.fn().mockReturnValue({
-          getRequest: () => mockRequest
-        })
-      };
-      
       // 인터셉터 호출 및 결과 구독
       const observableResult = await interceptor.intercept(
-        mockContext as unknown as ExecutionContext,
+        {
+          switchToHttp: () => ({ getRequest: () => req }),
+        } as unknown as ExecutionContext,
         callHandler,
       );
-      
+
       const result = observableResult.subscribe({
         next() {
           mockNextFn();
         },
-        error() {
-      
-        },
+        error() {},
         complete() {
-          // 테스트용 mock request 객체에서 queryRunner 가져오기
-          const queryRunner = mockRequest.queryRunner;
-          console.log(queryRunner)
-          // queryRunner 사용
-          queryRunner.manager.release(queryRunner.connection);
-        }
+          expect(queryRunner.commitTransaction()).toHaveBeenCalled();
+        },
       });
     });
 
     it('should rollback transaction and release query runner if the request fails', async () => {
-      callHandler.handle.mockImplementationOnce(() => observaleThrowError(new Error('Something went wrong')));
+      callHandler.handle.mockImplementationOnce(() =>
+        observaleThrowError(new Error('Something went wrong')),
+      );
 
-      await 
-        interceptor.intercept(
+      await interceptor
+        .intercept(
           {
             switchToHttp: () => ({ getRequest: () => req }),
           } as unknown as ExecutionContext,
           callHandler,
-        ).then((result) => {
-          catchError( async(err) => {
-            expect(result.pipe( tap( async () => {
-              expect(req.queryRunnerManager.rollbackTransaction).toHaveBeenCalled();
-              expect(req.queryRunnerManager.release).toHaveBeenCalled();
-              expect(err).toBeInstanceOf(InternalServerErrorException);
-            })))
-          })
-        })
+        )
+        .then((result) => {
+          catchError(async (err) => {
+            expect(
+              result.pipe(
+                tap(async () => {
+                  expect(
+                    req.queryRunnerManager.rollbackTransaction,
+                  ).toHaveBeenCalled();
+                  expect(req.queryRunnerManager.release).toHaveBeenCalled();
+                  expect(err).toBeInstanceOf(InternalServerErrorException);
+                }),
+              ),
+            );
+          });
+        });
     });
-  
   });
 
   describe('UsersService.prototype.signup', () => {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 
-import { SignupUserDto, User } from '../models/_.loader';
+import { SignupUserDto, User } from '../../models/_.loader';
 
 /** @deprecated */
 @Injectable()
